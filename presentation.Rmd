@@ -1,0 +1,55 @@
+---
+title: "Esophogeal Cancer Risk Estimation"
+author: "Eric Scuccimarra"
+date: "16 January 2018"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+data(esoph)
+```
+
+## System for Estimating Risk of Esophogeal Cancer
+
+I have created an application to estimate a person's risk of having esophogeal cancer based on three criteria:
+
+* Age group
+* Daily alcohol consumption
+* Daily tobacco consumption
+
+The estimations are based on data from a case-control study of esophageal cancer in Ille-et-Vilaine, France from 1980.
+
+In this presentation I will provide an overview of what the application does and how it generates it's estimates.
+
+## The Data
+
+The data comes from the R dataset "esoph." The data is preprocessed to generate a rate of esophogeal cancer as follows:
+
+$rate = cases /  controls$
+
+```{r loaddata}
+# Load the data
+data(esoph)
+# Add the rate for the group
+esoph$rate <- esoph$ncases / (esoph$ncases + esoph$ncontrols)
+```
+
+## Fit a Linear Model to the Data
+
+Although the data is already arranged by combination of the three criteria, I fit a linear model to the data to predict the rate based on the three features. This will allow flexibility in either incorporating new data in the future, or allowing the users to input continuous data rather than selecting from the pre-defined groups.
+
+```{r fitmodel}
+fit <- lm(rate ~ agegp + alcgp + tobgp, data= esoph)
+```
+
+## Estimating Risk
+
+Once the user has entered their data into the controls in the application, the data is fed into the linear model and used to generate an estimate of their risk for esophogeal cancer. The prediction is made with a confidence interval which is reported to the user along with the prediction.
+
+Below is the estimation of my risk:
+
+```{r predictions}
+predict(fit, newdata=data.frame(agegp = '35-44', alcgp = '0-39g/day', tobgp='0-9g/day'), interval="prediction")
+```
+Results below 0 are reported as 0%.

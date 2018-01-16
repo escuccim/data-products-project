@@ -8,13 +8,12 @@
 #
 
 library(shiny)
-data(esoph)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
 
   # Application title
-  titlePanel("Predictions of Esophogeal Cancer From Age, Alcohol and Nicotine Consumption"),
+  titlePanel("Estimation of Risk for Esophogeal Cancer"),
 
   # Sidebar with a slider input for number of bins
   sidebarLayout(
@@ -27,18 +26,31 @@ shinyUI(fluidPage(
                    list('0-39g/day','40-79','80-119','120+')),
        selectInput("tobgp",
                    "Please select your tobacco consumption:",
-                   list('0-9g/day','10-19','20-29','30+'))
+                   list('0-9g/day','10-19','20-29','30+')),
+       submitButton("Calculate my risk")
     ),
 
     # Show a plot of the generated distribution
     mainPanel(
-        h3("Your chances of having esophogeal cancer:"),
-        textOutput("prediction"),
-        h5("With a confidence interval of:"),
-        textOutput("confInt"),
-        br(),
-        p("This estimate is based on a case-control study of esophageal cancer in Ille-et-Vilaine, France in 1980."),
-        p("This data is merely a prediction based on the results of the study, it should not be used for any medical purposes. If you are worried about esophogeal cancer you should see a doctor.")
+        tabsetPanel(
+            tabPanel("My Risk",
+                     br(),
+                     h3("Your chances of having esophogeal cancer:"),
+                     textOutput("prediction"),
+                     h4("With a confidence interval of:"),
+                     textOutput("confInt")
+             ),
+            tabPanel("Instructions",
+                     br(),
+                     p("Make your selections from the drop-downs to the left and press the Calculate button to get an estimation of your chances of having esophogeal cancer.")
+            ),
+            tabPanel("Information",
+                     br(),
+                     p("This estimate is based on a case-control study of esophageal cancer in Ille-et-Vilaine, France in 1980."),
+                     p("This data is merely a prediction based on the results of the study, it should not be used for any medical purposes. If you are worried about esophogeal cancer you should see a doctor.")
+             )
+        )
+
     )
   )
 ))

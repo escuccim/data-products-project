@@ -26,7 +26,7 @@ In this presentation I will provide an overview of what the application does and
 
 The data comes from the R dataset "esoph." The data is preprocessed to generate a rate of esophogeal cancer as follows:
 
-$rate = cases /  controls$
+$rate = cases / (cases + controls)$
 
 ```{r loaddata}
 # Load the data
@@ -40,7 +40,7 @@ esoph$rate <- esoph$ncases / (esoph$ncases + esoph$ncontrols)
 Although the data is already arranged by combination of the three criteria, I fit a linear model to the data to predict the rate based on the three features. This will allow flexibility in either incorporating new data in the future, or allowing the users to input continuous data rather than selecting from the pre-defined groups.
 
 ```{r fitmodel}
-fit <- lm(rate ~ agegp + alcgp + tobgp, data= esoph)
+fit <- lm(rate ~ agegp + alcgp + tobgp, data = esoph)
 ```
 
 ## Estimating Risk

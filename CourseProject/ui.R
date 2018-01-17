@@ -18,15 +18,14 @@ shinyUI(fluidPage(
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(
-       selectInput("agegp",
-                   "Please select your age group:",
-                   list('25-34','35-44','45-54','55-64','65-74','75+')),
-       selectInput("alcgp",
-                   "Please select your alcohol consumption:",
-                   list('0-39g/day','40-79','80-119','120+')),
-       selectInput("tobgp",
-                   "Please select your tobacco consumption:",
-                   list('0-9g/day','10-19','20-29','30+')),
+       textInput("age",
+                   "Please enter your age:", value=35),
+       textInput("alc",
+                   "Please enter the average number of drinks per day:",
+                   value=1),
+       textInput("tob",
+                   "Please enter the number of cigarettes you smoke per day:",
+                   value=0),
        submitButton("Calculate my risk")
     ),
 

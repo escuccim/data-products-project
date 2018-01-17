@@ -24,32 +24,53 @@ In this presentation I will provide an overview of what the application does and
 
 ## The Data
 
-The data comes from the R dataset "esoph." The data is preprocessed to generate a rate of esophogeal cancer as follows:
-
-$rate = cases / (cases + controls)$
+The data comes from the R dataset "esoph." The data is preprocessed to calculate the prevalence of esophogeal cancer as cases / (cases + controls). In the data the features are stored as factors, I convert those to numeric by using the middle of each range to represent the range.
 
 ```{r loaddata}
 # Load the data
 data(esoph)
-# Add the rate for the group
 esoph$rate <- esoph$ncases / (esoph$ncases + esoph$ncontrols)
+esoph$ageI <- as.numeric(substr(esoph$agegp, 1, 2)) + 5
+levels(esoph$alcgp) <- c(20,60,100,140)
+esoph$alcI <- as.numeric(substr(esoph$alcgp,1,4))
+levels(esoph$tobgp)[1] <- "00-09"
+esoph$tobI <- as.numeric(substr(esoph$tobgp,1,2)) + 5
 ```
 
 ## Fit a Linear Model to the Data
 
-Although the data is already arranged by combination of the three criteria, I fit a linear model to the data to predict the rate based on the three features. This will allow flexibility in either incorporating new data in the future, or allowing the users to input continuous data rather than selecting from the pre-defined groups.
+Due to the relatively small sample size of the raw data and unequal sample sizes for each category, no smooth trends were present. In the raw data the prevalence of cancer for 65-74 year old people who drink 2 drinks a day and smoke 20 cigarettes was 22%, while that for people who smoke more than 30 cigarettes a day was 0%.
+
+To make this tool report usable data, I fit a linear model to the data, using the numeric representation of the factors as the features.
 
 ```{r fitmodel}
-fit <- lm(rate ~ agegp + alcgp + tobgp, data = esoph)
+# fit a linear model
+fit <- lm(rate ~ ageI + alcI + tobI, data = esoph)
+```
+
+## App Interface
+
+Since we are using a linear model, the user can enter their actual age rather than selecting from the categories. In the data the alcohol and tobacco consumption are in grams / day. To calculate the risk I assume that a cigarette contains 1 gram of tobacco and a drink contains 10 grams of alcohol.
+
+Once the user has entered the data into the inputs in the application, the data is fed into the linear model and used to generate an estimate of the user's risk of having esophogeal cancer.
+
+I use my actual data as an example:
+
+```{r userinput}
+age <- 40
+alc <- 0 * 10
+tob <- 0
 ```
 
 ## Estimating Risk
 
-Once the user has entered their data into the controls in the application, the data is fed into the linear model and used to generate an estimate of their risk for esophogeal cancer. The prediction is made with a confidence interval which is reported to the user along with the prediction.
-
-Below is the estimation of my risk:
+The user's data is fed into the linear model, which uses a prediction interval to generate a confidence interval. Since the chance of having cancer is always greater than 0, I round any numbers less than or equal to 0 up to 0.1. 
 
 ```{r predictions}
-predict(fit, newdata=data.frame(agegp = '35-44', alcgp = '0-39g/day', tobgp='0-9g/day'), interval="prediction")
+predict(fit, newdata=data.frame(ageI = age, alcI = alc, tobI=tob), 
+        interval="prediction")
 ```
-Results below 0 are reported as 0%.
+
+While accuracy of the model is questionable due to the vagaries of the raw data, it would be trivial to incorporate other data into the model, preferably from larger studies. 
+
+I hope this application will show people how reducing their tobacco and alcohol consumption can affect their risks for esophogeal cancer.

@@ -114,33 +114,51 @@
 
 </article></slide><slide class=""><hgroup><h2>The Data</h2></hgroup><article  id="the-data">
 
-<p>The data comes from the R dataset &quot;esoph.&quot; The data is preprocessed to generate a rate of esophogeal cancer as follows:</p>
-
-<p>\(rate = cases / (cases + controls)\)</p>
+<p>The data comes from the R dataset &quot;esoph.&quot; The data is preprocessed to calculate the prevalence of esophogeal cancer as cases / (cases + controls). In the data the features are stored as factors, I convert those to numeric by using the middle of each range to represent the range.</p>
 
 <pre class = 'prettyprint lang-r'># Load the data
 data(esoph)
-# Add the rate for the group
-esoph$rate &lt;- esoph$ncases / (esoph$ncases + esoph$ncontrols)</pre>
+esoph$rate &lt;- esoph$ncases / (esoph$ncases + esoph$ncontrols)
+esoph$ageI &lt;- as.numeric(substr(esoph$agegp, 1, 2)) + 5
+levels(esoph$alcgp) &lt;- c(20,60,100,140)
+esoph$alcI &lt;- as.numeric(substr(esoph$alcgp,1,4))
+levels(esoph$tobgp)[1] &lt;- &quot;00-09&quot;
+esoph$tobI &lt;- as.numeric(substr(esoph$tobgp,1,2)) + 5</pre>
 
 </article></slide><slide class=""><hgroup><h2>Fit a Linear Model to the Data</h2></hgroup><article  id="fit-a-linear-model-to-the-data">
 
-<p>Although the data is already arranged by combination of the three criteria, I fit a linear model to the data to predict the rate based on the three features. This will allow flexibility in either incorporating new data in the future, or allowing the users to input continuous data rather than selecting from the pre-defined groups.</p>
+<p>Due to the relatively small sample size of the raw data and unequal sample sizes for each category, no smooth trends were present. In the raw data the prevalence of cancer for 65-74 year old people who drink 2 drinks a day and smoke 20 cigarettes was 22%, while that for people who smoke more than 30 cigarettes a day was 0%.</p>
 
-<pre class = 'prettyprint lang-r'>fit &lt;- lm(rate ~ agegp + alcgp + tobgp, data= esoph)</pre>
+<p>To make this tool report usable data, I fit a linear model to the data, using the numeric representation of the factors as the features.</p>
+
+<pre class = 'prettyprint lang-r'># fit a linear model
+fit &lt;- lm(rate ~ ageI + alcI + tobI, data = esoph)</pre>
+
+</article></slide><slide class=""><hgroup><h2>App Interface</h2></hgroup><article  id="app-interface">
+
+<p>Since we are using a linear model, the user can enter their actual age rather than selecting from the categories. In the data the alcohol and tobacco consumption are in grams / day. To calculate the risk I assume that a cigarette contains 1 gram of tobacco and a drink contains 10 grams of alcohol.</p>
+
+<p>Once the user has entered the data into the inputs in the application, the data is fed into the linear model and used to generate an estimate of the user&#39;s risk of having esophogeal cancer.</p>
+
+<p>I use my actual data as an example:</p>
+
+<pre class = 'prettyprint lang-r'>age &lt;- 40
+alc &lt;- 0 * 10
+tob &lt;- 0</pre>
 
 </article></slide><slide class=""><hgroup><h2>Estimating Risk</h2></hgroup><article  id="estimating-risk">
 
-<p>Once the user has entered their data into the controls in the application, the data is fed into the linear model and used to generate an estimate of their risk for esophogeal cancer. The prediction is made with a confidence interval which is reported to the user along with the prediction.</p>
+<p>The user&#39;s data is fed into the linear model, which uses a prediction interval to generate a confidence interval. Since the chance of having cancer is always greater than 0, I round any numbers less than or equal to 0 up to 0.1.</p>
 
-<p>Below is the estimation of my risk:</p>
+<pre class = 'prettyprint lang-r'>predict(fit, newdata=data.frame(ageI = age, alcI = alc, tobI=tob), 
+        interval=&quot;prediction&quot;)</pre>
 
-<pre class = 'prettyprint lang-r'>predict(fit, newdata=data.frame(agegp = &#39;35-44&#39;, alcgp = &#39;0-39g/day&#39;, tobgp=&#39;0-9g/day&#39;), interval=&quot;prediction&quot;)</pre>
+<pre >##          fit        lwr       upr
+## 1 -0.1026984 -0.3426435 0.1372466</pre>
 
-<pre >##           fit        lwr       upr
-## 1 -0.07765823 -0.3162503 0.1609338</pre>
+<p>While accuracy of the model is questionable due to the vagaries of the raw data, it would be trivial to incorporate other data into the model, preferably from larger studies.</p>
 
-<p>Results below 0 are reported as 0%.</p></article></slide>
+<p>I hope this application will show people how reducing their tobacco and alcohol consumption can affect their risks for esophogeal cancer.</p></article></slide>
 
 
   <slide class="backdrop"></slide>

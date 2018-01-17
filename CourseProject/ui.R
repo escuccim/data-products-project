@@ -41,7 +41,7 @@ shinyUI(fluidPage(
              ),
             tabPanel("Instructions",
                      br(),
-                     p("Make your selections from the drop-downs to the left and press the Calculate button to get an estimation of your chances of having esophogeal cancer.")
+                     p("Enter your information in the inputs to the left and press the Calculate button to get an estimation of your chances of having esophogeal cancer.")
             ),
             tabPanel("Information",
                      br(),

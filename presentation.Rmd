@@ -20,7 +20,7 @@ I have created an application to estimate a person's risk of having esophogeal c
 
 The estimations are based on data from a case-control study of esophageal cancer in Ille-et-Vilaine, France from 1980.
 
-In this presentation I will provide an overview of what the application does and how it generates it's estimates.
+A demo is available at https://ericscuccimarra.shinyapps.io/DataProductsCourseProject/
 
 ## The Data
 
